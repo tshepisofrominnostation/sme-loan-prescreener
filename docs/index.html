@@ -110,7 +110,30 @@ tailwind.config = { theme: { extend: { colors: { navy:'#0b4d24', panel:'#ffffff'
     </section>
   </div>
 
-  <footer class="text-center text-xs text-[#6b7f74] mt-10">
+
+  <section class="card p-6">
+    <p class="text-xs font-bold tracking-[.2em] text-[#009639] mb-4">BATCH PRE-SCREENING (ADVANCED)</p>
+    <p class="text-sm text-[#51685c] mb-4">Score a whole pipeline of applications at once. Upload a CSV with the seven input columns, or load the bundled sample portfolio. Everything is computed in your browser; nothing is uploaded anywhere.</p>
+    <div class="flex flex-wrap gap-3 items-center mb-4">
+      <button id="loadSample" class="btn btn-primary">Load bundled sample portfolio (12)</button>
+      <label class="btn border border-[#d7e3da] rounded-[.7rem] font-bold px-4 py-2 cursor-pointer text-[#123524] bg-white hover:border-[#009639]">
+        Upload CSV<input id="batchFile" type="file" accept=".csv" class="hidden">
+      </label>
+      <button id="downloadScored" class="btn border border-[#d7e3da] rounded-[.7rem] font-bold px-4 py-2 bg-white text-[#123524] hover:border-[#009639]" style="display:none">Download scored CSV</button>
+    </div>
+    <div id="batchStats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4" style="display:none"></div>
+    <div class="overflow-x-auto" style="display:none" id="batchWrap">
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-[#6b7f74] text-xs uppercase tracking-wider border-b border-[#d7e3da]">
+          <th class="py-2 pr-4">Business</th><th class="py-2 pr-4">Sector</th><th class="py-2 pr-4">Indication</th>
+          <th class="py-2 pr-4">Probability</th><th class="py-2 pr-4">Confidence</th><th class="py-2">Top factor</th>
+        </tr></thead>
+        <tbody id="batchBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+    <footer class="text-center text-xs text-[#6b7f74] mt-10">
     Prototype by Freddy Thosago · synthetic data only, no real customers ·
     <a class="text-cyan hover:underline" href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank">full evaluation, fairness audit and executive write-up on GitHub</a>
   </footer>
@@ -248,6 +271,98 @@ function factorsOf(a) {
 
   return out;
 }
+
+
+// ============ BATCH PRE-SCREENING ============
+const SAMPLE_BATCH = [
+["Thabo's Hardware","retail",420000,330000,35000,7,650000,1],
+["Nomvula Events","hospitality",180000,160000,12000,3,300000,1],
+["Kasi Kitchens","hospitality",95000,88000,9000,1.5,150000,0],
+["Sgila Logistics","services",310000,225000,28000,9,500000,1],
+["Mzansi Construction","construction",560000,470000,90000,11,1200000,1],
+["Bright Futures Academy","services",140000,105000,8000,4,200000,1],
+["eKasi Fashion","retail",210000,178000,22000,2,350000,0],
+["Soweto AutoSpa","services",125000,101000,9000,5,180000,1],
+["Molomo Farming","retail",260000,215000,18000,8,400000,1],
+["Ubuhle Decor","retail",80000,74000,6000,1,120000,0],
+["ProPlumb Solutions","construction",195000,158000,45000,6,280000,0],
+["Tucker's Deli","hospitality",66000,58000,2000,3,90000,1]
+];
+let BATCH_RESULTS = [];
+
+function scoreBatch(rows) {
+  const COLS = ["name","sector","revenue","costs","debt","years","loan","history"];
+  return rows.map(r => {
+    const obj = {};
+    COLS.forEach((c, i) => obj[c] = r[i]);
+    const app = {revenue:+obj.revenue, costs:+obj.costs, debt:+obj.debt, years:+obj.years, sector:obj.sector, loan:+obj.loan, history:+obj.history};
+    const p = approvalProbability(app);
+    const b = bandOf(p);
+    const fac = factorsOf(app);
+    const top = fac.find(f => f[0] !== "neutral") || fac[0];
+    return {name: obj.name, sector: obj.sector, p, band: b, conf: confidenceOf(p, b), topFactor: top[1]};
+  });
+}
+
+function confidenceOf(p, band) {
+  if (band.key === "likely")   return Math.round(55 + 40 * Math.min(1, (p - BANDS.high) / (1 - BANDS.high)));
+  if (band.key === "unlikely") return Math.round(55 + 40 * Math.min(1, (BANDS.low - p) / BANDS.low));
+  return Math.round(50 + 20 * (2 * Math.abs(p - (BANDS.low + BANDS.high) / 2) / (BANDS.high - BANDS.low)));
+}
+
+function renderBatch(results) {
+  BATCH_RESULTS = results;
+  const counts = {likely:0, review:0, unlikely:0};
+  results.forEach(r => counts[r.band.key]++);
+  const n = results.length;
+  const stats = [
+    ["Applications scored", n],
+    ["Likely to qualify", counts.likely + " (" + Math.round(100 * counts.likely / n) + "%)"],
+    ["Needs review", counts.review + " (" + Math.round(100 * counts.review / n) + "%)"],
+    ["Unlikely", counts.unlikely + " (" + Math.round(100 * counts.unlikely / n) + "%)"],
+  ];
+  document.getElementById("batchStats").style.display = "grid";
+  document.getElementById("batchStats").innerHTML = stats.map(([k, v]) =>
+    `<div class="rounded-xl border border-[#d7e3da] bg-[#f7faf8] px-4 py-3"><p class="text-[10px] font-bold uppercase tracking-wider text-[#6b7f74]">${k}</p><p class="text-xl font-extrabold text-[#123524] mt-1">${v}</p></div>`).join("");
+  document.getElementById("batchWrap").style.display = "block";
+  document.getElementById("batchBody").innerHTML = results.map(r => `
+    <tr class="border-b border-[#e6efe9]">
+      <td class="py-2 pr-4 font-semibold text-[#123524]">${r.name}</td>
+      <td class="py-2 pr-4 capitalize text-[#51685c]">${r.sector}</td>
+      <td class="py-2 pr-4"><span class="band-pill ${r.band.cls}" style="font-size:.72rem; padding:.25rem .7rem">${r.band.label}</span></td>
+      <td class="py-2 pr-4 font-bold text-[#123524]">${(r.p * 100).toFixed(1)}%</td>
+      <td class="py-2 pr-4 text-[#51685c]">${r.conf}%</td>
+      <td class="py-2 text-[13px] text-[#51685c]">${r.topFactor.slice(0, 95)}…</td>
+    </tr>`).join("");
+  document.getElementById("downloadScored").style.display = "inline-block";
+}
+
+document.getElementById("loadSample").onclick = () => renderBatch(scoreBatch(SAMPLE_BATCH));
+document.getElementById("downloadScored").onclick = () => {
+  const head = "business,sector,probability,indication,confidence,top_factor\n";
+  const csv = BATCH_RESULTS.map(r =>
+    `"${r.name}",${r.sector},${(r.p * 100).toFixed(1)}%,${r.band.label},${r.conf}%,"${r.topFactor.replace(/"/g, "'")}"`).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([head + csv], {type: "text/csv"}));
+  a.download = "scored_applications.csv";
+  a.click();
+};
+document.getElementById("batchFile").onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const lines = String(reader.result).trim().split(/\r?\n/);
+    const rows = lines.slice(1).filter(Boolean).map(l => {
+      const cells = l.match(/("([^"]*)"|[^,]+)(,|$)/g) ? l.split(",").map(c => c.replace(/^"|"$/g, "").trim()) : l.split(",");
+      return cells;
+    });
+    if (!rows.length) { alert("No data rows found in the CSV."); return; }
+    renderBatch(scoreBatch(rows));
+  };
+  reader.readAsText(f);
+};
+// ============ END BATCH ============
 
 document.getElementById("run").onclick = () => {
   const app = {
