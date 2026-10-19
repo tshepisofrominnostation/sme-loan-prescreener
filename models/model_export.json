@@ -1,0 +1,35 @@
+{
+  "features": [
+    "coverage",
+    "margin",
+    "debt_burden",
+    "loan_to_revenue",
+    "Years_Trading",
+    "Prior_Loan_History"
+  ],
+  "scaler_mean": [
+    0.6058,
+    0.2131,
+    0.1345,
+    3.2958,
+    7.8692,
+    0.47
+  ],
+  "scaler_scale": [
+    0.5969,
+    0.0716,
+    0.1488,
+    1.6136,
+    4.1396,
+    0.4991
+  ],
+  "intercept": -0.1814,
+  "coefficients": {
+    "coverage": 0.6989,
+    "margin": 0.2656,
+    "debt_burden": -0.069,
+    "loan_to_revenue": -0.148,
+    "Years_Trading": 0.5841,
+    "Prior_Loan_History": 0.4922
+  }
+}

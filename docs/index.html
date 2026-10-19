@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explainable, fair AI loan pre-screening for South African SMEs. Indicative three-band assessment with plain-language factors — human judgment is final.">
+<title>SME Loan Pre-Screener — Explainable AI for SA SMEs</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { navy:'#0a1628', panel:'#0f2038', line:'#1d3557', cyan:'#22d3ee', orange:'#f59e0b' } } } }
+</script>
+<style>
+  body { background:#0a1628; color:#e6edf7; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { background:#0f2038; border:1px solid #1d3557; border-radius:1rem; }
+  label { font-size:.8rem; font-weight:600; color:#8aa2bd; display:block; margin-bottom:.3rem; }
+  input, select { width:100%; background:#0a1628; border:1px solid #1d3557; border-radius:.6rem; padding:.55rem .8rem; color:#e6edf7; font-weight:600; }
+  input:focus, select:focus { outline:none; border-color:#22d3ee; box-shadow:0 0 0 3px rgba(34,211,238,.15); }
+  .btn { border-radius:.7rem; font-weight:700; padding:.7rem 1.3rem; transition:.2s; }
+  .btn-primary { background:#22d3ee; color:#06202a; }
+  .btn-primary:hover { background:#67e8f9; }
+  .factor { border-left:3px solid; border-radius:.4rem; padding:.55rem .8rem; margin:.45rem 0; font-size:.92rem; color:#cbd5e1; background:rgba(15,32,56,.6); }
+  .f-up { border-color:#34d399; } .f-down { border-color:#f87171; } .f-neutral { border-color:#64748b; }
+  .band-pill { display:inline-flex; align-items:center; gap:.5rem; border-radius:999px; padding:.5rem 1.1rem; font-weight:800; font-size:1.05rem; }
+  .band-likely { background:rgba(52,211,153,.15); color:#34d399; border:1px solid rgba(52,211,153,.4); }
+  .band-review { background:rgba(250,204,21,.15); color:#facc15; border:1px solid rgba(250,204,21,.4); }
+  .band-unlikely { background:rgba(248,113,113,.15); color:#f87171; border:1px solid rgba(248,113,113,.4); }
+  .disclaimer { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.45); border-radius:1rem; }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+
+  <header class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">SME Loan Pre-Screener</h1>
+      <p class="text-sm text-slate-400 mt-1 max-w-xl">Explainable, fair pre-screening for South African SME working-capital applications. An AI co-pilot for credit officers — computed entirely in your browser.</p>
+    </div>
+    <div class="flex gap-2">
+      <span class="text-[11px] font-bold tracking-widest text-cyan border border-cyan/30 rounded-full px-3 py-1.5">LOGISTIC MODEL · AUDITABLE</span>
+      <a href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank" class="text-[11px] font-bold tracking-widest border border-line rounded-full px-3 py-1.5 hover:border-cyan/50">GITHUB REPO</a>
+    </div>
+  </header>
+
+  <div class="disclaimer px-4 py-3 mb-6 text-sm text-amber-200/90">
+    <b class="text-amber-300">Indicative pre-screen only — human judgment is final.</b>
+    This tool does not approve or decline loans; it helps a qualified credit officer decide faster.
+    Production deployment would require compliance with the National Credit Act (NCA) and POPIA (out of scope for this prototype).
+  </div>
+
+  <div class="grid lg:grid-cols-5 gap-6">
+    <!-- FORM -->
+    <section class="card p-6 lg:col-span-2 h-fit">
+      <h2 class="text-xs font-bold tracking-[.2em] text-cyan mb-5">APPLICATION INTAKE</h2>
+      <div class="space-y-4">
+        <div><label>Monthly revenue (ZAR)</label><input id="revenue" type="number" value="250000" min="5000" step="1000"></div>
+        <div><label>Monthly operating costs (ZAR)</label><input id="costs" type="number" value="175000" min="1000" step="1000"></div>
+        <div><label>Existing monthly debt repayments (ZAR)</label><input id="debt" type="number" value="8000" min="0" step="500"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label>Years trading</label><input id="years" type="number" value="6" min="0.5" step="0.5"></div>
+          <div><label>Sector</label>
+            <select id="sector">
+              <option>retail</option><option>services</option><option>construction</option>
+              <option>hospitality</option><option>manufacturing</option>
+            </select>
+          </div>
+        </div>
+        <div><label>Requested loan amount (ZAR)</label><input id="loan" type="number" value="400000" min="5000" step="10000"></div>
+        <div><label>Prior loan history</label>
+          <select id="history"><option value="1">Yes</option><option value="0">No</option></select>
+        </div>
+        <button id="run" class="btn btn-primary w-full mt-2">Run pre-screen</button>
+        <p class="text-[11px] text-slate-500 leading-4">Sector is recorded for auditing and fairness monitoring but is excluded from the model inputs — see the fairness note below.</p>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="lg:col-span-3 space-y-6">
+      <div id="result" class="card p-6 hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold tracking-[.2em] text-slate-400 mb-2">INDICATIVE ASSESSMENT</p>
+            <span id="band" class="band-pill"></span>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-bold tracking-[.2em] text-slate-400">CONFIDENCE</p>
+            <p id="conf" class="text-3xl font-extrabold"></p>
+            <p id="prob" class="text-xs text-slate-500 mt-1"></p>
+          </div>
+        </div>
+        <div class="mt-4 h-3 rounded-full overflow-hidden" style="background:#0a1628; border:1px solid #1d3557">
+          <div id="probbar" class="h-full transition-all duration-500" style="width:0%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-slate-500 mt-1"><span>0%</span><span>35% — review band — 65%</span><span>100%</span></div>
+      </div>
+
+      <div id="factors" class="card p-6 hidden">
+        <h2 class="text-xs font-bold tracking-[.2em] text-cyan mb-4">WHY THIS ASSESSMENT — FACTORS THAT RAISED OR LOWERED THE SCORE</h2>
+        <div id="factorList"></div>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="text-xs font-bold tracking-[.2em] text-cyan mb-3">MODEL TRANSPARENCY &amp; FAIRNESS</h2>
+        <ul class="text-[13px] text-slate-400 space-y-2 list-disc pl-5">
+          <li>Deployed model: <b class="text-slate-200">logistic regression</b> over four auditable ratios (instalment coverage, operating margin, debt burden, loan-to-revenue) plus trading years and prior history. Every factor maps 1:1 to a model input.</li>
+          <li>Held-out test (200 SMEs): <b class="text-slate-200">ROC-AUC 0.72</b>, precision 0.49, recall 0.64 — recall is weighted above precision so fundable SMEs are not wrongly discouraged (false negatives harm the applicant).</li>
+          <li>Fairness audit (see repo): false-negative rates are monitored by sector and business size; business-size proxies (raw Rand amounts) are excluded from the model — only scale-free ratios are used.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <footer class="text-center text-xs text-slate-500 mt-10">
+    Prototype by Freddy Thosago · synthetic data only, no real customers ·
+    <a class="text-cyan hover:underline" href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank">full evaluation, fairness audit and executive write-up on GitHub</a>
+  </footer>
+</div>
+
+<script>
+// ── deployed model export (models/model_export.json, Python-trained) ──────
+const EXPORT = {
+  "features": [
+    "coverage",
+    "margin",
+    "debt_burden",
+    "loan_to_revenue",
+    "Years_Trading",
+    "Prior_Loan_History"
+  ],
+  "scaler_mean": [
+    0.6058,
+    0.2131,
+    0.1345,
+    3.2958,
+    7.8692,
+    0.47
+  ],
+  "scaler_scale": [
+    0.5969,
+    0.0716,
+    0.1488,
+    1.6136,
+    4.1396,
+    0.4991
+  ],
+  "intercept": -0.1814,
+  "coefficients": {
+    "coverage": 0.6989,
+    "margin": 0.2656,
+    "debt_burden": -0.069,
+    "loan_to_revenue": -0.148,
+    "Years_Trading": 0.5841,
+    "Prior_Loan_History": 0.4922
+  }
+};
+
+const BANDS = { low: 0.35, high: 0.65 };
+
+const zar = v => "R" + Math.round(v).toLocaleString("en-ZA");
+
+function featuresOf(a) {
+  const revenue = Math.max(a.revenue, 1), costs = a.costs, debt = a.debt, loan = a.loan;
+  const freeCash = Math.max(revenue - costs - debt, 1);
+  const repayment = Math.max(loan / 24, 1);
+  return {
+    coverage: Math.log1p(freeCash / repayment),
+    margin: (revenue - costs) / revenue,
+    debt_burden: debt / revenue,
+    loan_to_revenue: loan / revenue,
+    Years_Trading: a.years,
+    Prior_Loan_History: a.history
+  };
+}
+
+function approvalProbability(a) {
+  const f = featuresOf(a);
+  let z = EXPORT.intercept;
+  EXPORT.features.forEach((name, i) => {
+    const scaled = (f[name] - EXPORT.scaler_mean[i]) / EXPORT.scaler_scale[i];
+    z += scaled * EXPORT.coefficients[name];
+  });
+  return 1 / (1 + Math.exp(-z));
+}
+
+function bandOf(p) {
+  if (p >= BANDS.high) return { key: "likely", label: "LIKELY TO QUALIFY", cls: "band-likely", dot: "#34d399" };
+  if (p >= BANDS.low)  return { key: "review", label: "NEEDS REVIEW",       cls: "band-review", dot: "#facc15" };
+  return { key: "unlikely", label: "UNLIKELY TO QUALIFY", cls: "band-unlikely", dot: "#f87171" };
+}
+
+function confidenceOf(p) {
+  const { low, high } = BANDS;
+  let raw;
+  if (p >= high) raw = (p - high) / (1 - high);
+  else if (p < low) raw = (low - p) / low;
+  else { raw = Math.min(Math.abs(p - low), Math.abs(p - high)) / (high - low); raw = 1 - raw * 2; }
+  return Math.round(50 + 45 * Math.min(Math.max(raw, 0), 1));
+}
+
+function factorsOf(a) {
+  const revenue = Math.max(a.revenue, 1);
+  const freeCash = Math.max(a.revenue - a.costs - a.debt, 0);
+  const repayment = Math.max(a.loan / 24, 1);
+  const coverage = freeCash / repayment;
+  const debtBurden = a.debt / revenue;
+  const margin = (a.revenue - a.costs) / a.revenue;
+  const loanMonths = a.loan / revenue;
+  const out = [];
+
+  if (coverage >= 2)
+    out.push(["up", `After costs and existing debt, free cash of ${zar(freeCash)} per month covers the estimated new instalment of ${zar(repayment)} about ${coverage.toFixed(1)} times over — a healthy affordability cushion.`]);
+  else if (coverage >= 1)
+    out.push(["down", `Free cash of ${zar(freeCash)} covers the estimated instalment of ${zar(repayment)} only ${coverage.toFixed(1)} times. Under 2x coverage the committee treats affordability as tight, lowering the score.`]);
+  else
+    out.push(["down", `Free cash of ${zar(freeCash)} per month does not cover the estimated instalment of ${zar(repayment)} (coverage ${coverage.toFixed(1)}x). As modeled, this loan is not affordable on current cash flow.`]);
+
+  if (debtBurden >= 0.30)
+    out.push(["down", `Existing debt repayments consume ${(debtBurden*100).toFixed(0)}% of monthly revenue, above the 30% affordability ceiling — this significantly lowers the qualification score.`]);
+  else if (a.debt > 0)
+    out.push(["up", `Existing debt repayments consume only ${(debtBurden*100).toFixed(0)}% of monthly revenue, comfortably inside the 30% ceiling.`]);
+  else
+    out.push(["up", "No existing monthly debt repayments are recorded — the balance sheet has capacity for new credit."]);
+
+  if (margin >= 0.15)
+    out.push(["up", `Operating costs consume ${((1-margin)*100).toFixed(0)}% of revenue, leaving a ${(margin*100).toFixed(0)}% operating margin — above the 15% healthy-business bar.`]);
+  else if (margin >= 0.05)
+    out.push(["down", `Operating costs consume ${((1-margin)*100).toFixed(0)}% of revenue, leaving only a ${(margin*100).toFixed(0)}% margin — thin for absorbing a new instalment.`]);
+  else
+    out.push(["down", `Operating costs consume ${((1-margin)*100).toFixed(0)}% of revenue; a ${(margin*100).toFixed(0)}% margin leaves almost no room to service new debt.`]);
+
+  if (loanMonths <= 3)
+    out.push(["up", `The requested ${zar(a.loan)} is about ${loanMonths.toFixed(1)} months of revenue — a conservative ask relative to turnover.`]);
+  else if (loanMonths <= 6)
+    out.push(["neutral", `The requested ${zar(a.loan)} is about ${loanMonths.toFixed(1)} months of revenue, a sizeable but not unusual working-capital request.`]);
+  else
+    out.push(["down", `The requested ${zar(a.loan)} is about ${loanMonths.toFixed(1)} months of revenue — a large ask relative to turnover, which raises repayment risk.`]);
+
+  if (a.years >= 5)
+    out.push(["up", `${a.years.toFixed(0)} years of trading history provides an established track record.`]);
+  else if (a.years >= 2)
+    out.push(["neutral", `${a.years.toFixed(1)} years of trading — a moderate track record.`]);
+  else
+    out.push(["down", `Only ${a.years.toFixed(1)} years of trading; young businesses carry higher failure risk in the committee's view.`]);
+
+  out.push(a.history === 1
+    ? ["up", "The owner has prior loan history, which supports a repayment track record."]
+    : ["down", "No prior loan history is recorded, so repayment behaviour is unproven."]);
+
+  return out;
+}
+
+document.getElementById("run").onclick = () => {
+  const app = {
+    revenue: +document.getElementById("revenue").value || 0,
+    costs: +document.getElementById("costs").value || 0,
+    debt: +document.getElementById("debt").value || 0,
+    years: +document.getElementById("years").value || 1,
+    loan: +document.getElementById("loan").value || 0,
+    history: +document.getElementById("history").value
+  };
+  const p = approvalProbability(app);
+  const band = bandOf(p);
+  const conf = confidenceOf(p);
+
+  const bandEl = document.getElementById("band");
+  bandEl.className = "band-pill " + band.cls;
+  bandEl.innerHTML = `<span style="width:.7rem;height:.7rem;border-radius:50%;background:${band.dot};display:inline-block"></span>${band.label}`;
+  document.getElementById("conf").textContent = conf + "%";
+  document.getElementById("conf").style.color = band.dot;
+  document.getElementById("prob").textContent = `model approval probability: ${(p*100).toFixed(1)}%  ·  bands: unlikely <35% / review 35–65% / likely >65%`;
+
+  const bar = document.getElementById("probbar");
+  bar.style.width = (p * 100).toFixed(1) + "%";
+  bar.style.background = `linear-gradient(90deg, ${band.dot}cc, ${band.dot})`;
+
+  document.getElementById("result").classList.remove("hidden");
+
+  const list = document.getElementById("factorList");
+  list.innerHTML = factorsOf(app).map(([dir, text]) => {
+    const icon = dir === "up" ? "▲" : dir === "down" ? "▼" : "•";
+    const color = dir === "up" ? "#34d399" : dir === "down" ? "#f87171" : "#94a3b8";
+    return `<div class="factor f-${dir}"><span style="color:${color};font-weight:700">${icon}</span> ${text}</div>`;
+  }).join("");
+  document.getElementById("factors").classList.remove("hidden");
+  document.getElementById("factors").scrollIntoView({ behavior: "smooth", block: "nearest" });
+};
+</script>
+</body>
+</html>

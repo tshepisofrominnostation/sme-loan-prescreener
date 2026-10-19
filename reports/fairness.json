@@ -1,0 +1,56 @@
+{
+  "note": "Synthetic data: the sector gap below is engineered into the generator (construction/hospitality risk premium) so the audit has a real disparity to surface; see README disclosure.",
+  "by_sector": {
+    "construction": {
+      "n": 32,
+      "approval_rate_truth": 0.281,
+      "false_negatives": 6,
+      "fn_rate_among_approvable": 0.667,
+      "false_positives": 7
+    },
+    "hospitality": {
+      "n": 26,
+      "approval_rate_truth": 0.154,
+      "false_negatives": 1,
+      "fn_rate_among_approvable": 0.25,
+      "false_positives": 7
+    },
+    "manufacturing": {
+      "n": 23,
+      "approval_rate_truth": 0.609,
+      "false_negatives": 7,
+      "fn_rate_among_approvable": 0.5,
+      "false_positives": 2
+    },
+    "retail": {
+      "n": 49,
+      "approval_rate_truth": 0.388,
+      "false_negatives": 8,
+      "fn_rate_among_approvable": 0.421,
+      "false_positives": 12
+    },
+    "services": {
+      "n": 70,
+      "approval_rate_truth": 0.286,
+      "false_negatives": 2,
+      "fn_rate_among_approvable": 0.1,
+      "false_positives": 15
+    }
+  },
+  "by_size": {
+    "smaller half": {
+      "n": 100,
+      "approval_rate_truth": 0.38,
+      "false_negatives": 10,
+      "fn_rate_among_approvable": 0.263,
+      "false_positives": 23
+    },
+    "larger half": {
+      "n": 100,
+      "approval_rate_truth": 0.28,
+      "false_negatives": 14,
+      "fn_rate_among_approvable": 0.5,
+      "false_positives": 20
+    }
+  }
+}
