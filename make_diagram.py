@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-NAVY, PANEL, CYAN, ORANGE, MUTED = "#0a1628", "#0f2038", "#22d3ee", "#f59e0b", "#8aa2bd"
+NAVY, PANEL, CYAN, ORANGE, MUTED = "#f2f6f3", "#ffffff", "#009639", "#e08a00", "#51685c"
 
 fig, ax = plt.subplots(figsize=(11, 7), dpi=160)
 fig.patch.set_facecolor(NAVY); ax.set_facecolor(NAVY)
@@ -16,17 +16,17 @@ def box(x, y, w, h, title, lines, edge=CYAN, fill=PANEL):
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.6",
                                 fc=fill, ec=edge, lw=1.6))
     ax.text(x + w/2, y + h - 2.4, title, ha="center", va="top",
-            fontsize=10.5, fontweight="bold", color="#e6edf7")
+            fontsize=10.5, fontweight="bold", color="#0b4d24")
     for i, line in enumerate(lines):
         ax.text(x + w/2, y + h - 5.6 - i*3.1, line, ha="center", va="top",
-                fontsize=8.2, color=MUTED)
+                fontsize=8.2, color="#2f4237")
 
 def arrow(x1, y1, x2, y2, color=CYAN):
     ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>",
                                  mutation_scale=16, lw=1.6, color=color))
 
 ax.text(50, 67, "SME Loan Pre-Screening — Application Workflow",
-        ha="center", fontsize=15, fontweight="bold", color="#e6edf7")
+        ha="center", fontsize=15, fontweight="bold", color="#0b4d24")
 ax.text(50, 63.2, "Indicative pre-screen only — a human credit officer makes every final decision",
         ha="center", fontsize=9, color=ORANGE)
 

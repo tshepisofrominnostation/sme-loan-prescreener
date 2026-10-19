@@ -17,9 +17,9 @@ st.set_page_config(page_title="SME Loan Pre-Screener", page_icon="🧾",
                    layout="wide", initial_sidebar_state="expanded")
 
 BAND_STYLE = {
-    "Likely to qualify": ("🟢", "#34d399"),
-    "Needs review": ("🟡", "#facc15"),
-    "Unlikely to qualify": ("🔴", "#f87171"),
+    "Likely to qualify": ("🟢", "#009639"),
+    "Needs review": ("🟡", "#e08a00"),
+    "Unlikely to qualify": ("🔴", "#c62828"),
 }
 
 st.title("SME Loan Pre-Screener")
@@ -70,7 +70,7 @@ with left:
     st.subheader("Why this assessment")
     for factor in result["factors"]:
         icon = {"up": "▲", "down": "▼", "neutral": "•"}[factor["direction"]]
-        tint = {"up": "#34d399", "down": "#f87171", "neutral": "#9ca3af"}[factor["direction"]]
+        tint = {"up": "#009639", "down": "#c62828", "neutral": "#8aa095"}[factor["direction"]]
         st.markdown(
             f"<div style='border-left:3px solid {tint};padding-left:.6rem;margin:.4rem 0;"
             f"color:#cbd5e1;font-size:.95rem'>{icon} {factor['text']}</div>",

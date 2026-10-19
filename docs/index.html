@@ -8,42 +8,42 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-tailwind.config = { theme: { extend: { colors: { navy:'#0a1628', panel:'#0f2038', line:'#1d3557', cyan:'#22d3ee', orange:'#f59e0b' } } } }
+tailwind.config = { theme: { extend: { colors: { navy:'#0b4d24', panel:'#ffffff', line:'#d7e3da', cyan:'#009639', orange:'#e08a00' } } } }
 </script>
 <style>
-  body { background:#0a1628; color:#e6edf7; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .card { background:#0f2038; border:1px solid #1d3557; border-radius:1rem; }
-  label { font-size:.8rem; font-weight:600; color:#8aa2bd; display:block; margin-bottom:.3rem; }
-  input, select { width:100%; background:#0a1628; border:1px solid #1d3557; border-radius:.6rem; padding:.55rem .8rem; color:#e6edf7; font-weight:600; }
-  input:focus, select:focus { outline:none; border-color:#22d3ee; box-shadow:0 0 0 3px rgba(34,211,238,.15); }
+  body { background:#f2f6f3; color:#173523; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { background:#ffffff; border:1px solid #d7e3da; border-radius:1rem; box-shadow:0 1px 3px rgba(11,77,36,.07); }
+  label { font-size:.8rem; font-weight:600; color:#4b5f55; display:block; margin-bottom:.3rem; }
+  input, select { width:100%; background:#fbfdfc; border:1px solid #c9d8ce; border-radius:.6rem; padding:.55rem .8rem; color:#123524; font-weight:600; }
+  input:focus, select:focus { outline:none; border-color:#009639; box-shadow:0 0 0 3px rgba(0,150,57,.15); }
   .btn { border-radius:.7rem; font-weight:700; padding:.7rem 1.3rem; transition:.2s; }
-  .btn-primary { background:#22d3ee; color:#06202a; }
-  .btn-primary:hover { background:#67e8f9; }
-  .factor { border-left:3px solid; border-radius:.4rem; padding:.55rem .8rem; margin:.45rem 0; font-size:.92rem; color:#cbd5e1; background:rgba(15,32,56,.6); }
-  .f-up { border-color:#34d399; } .f-down { border-color:#f87171; } .f-neutral { border-color:#64748b; }
+  .btn-primary { background:#009639; color:#ffffff; }
+  .btn-primary:hover { background:#007a2e; }
+  .factor { border-left:3px solid; border-radius:.4rem; padding:.55rem .8rem; margin:.45rem 0; font-size:.92rem; color:#2f4237; background:#f6faf7; }
+  .f-up { border-color:#009639; } .f-down { border-color:#c62828; } .f-neutral { border-color:#8aa095; }
   .band-pill { display:inline-flex; align-items:center; gap:.5rem; border-radius:999px; padding:.5rem 1.1rem; font-weight:800; font-size:1.05rem; }
-  .band-likely { background:rgba(52,211,153,.15); color:#34d399; border:1px solid rgba(52,211,153,.4); }
-  .band-review { background:rgba(250,204,21,.15); color:#facc15; border:1px solid rgba(250,204,21,.4); }
-  .band-unlikely { background:rgba(248,113,113,.15); color:#f87171; border:1px solid rgba(248,113,113,.4); }
-  .disclaimer { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.45); border-radius:1rem; }
+  .band-likely { background:rgba(0,150,57,.10); color:#007a2e; border:1px solid rgba(0,150,57,.35); }
+  .band-review { background:rgba(224,138,0,.12); color:#9a6200; border:1px solid rgba(224,138,0,.35); }
+  .band-unlikely { background:rgba(198,40,40,.10); color:#b71c1c; border:1px solid rgba(198,40,40,.35); }
+  .disclaimer { background:#fff8e8; border:1px solid #e3c063; border-radius:1rem; color:#7a5200; }
 </style>
 </head>
 <body class="min-h-screen">
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
-  <header class="flex flex-wrap items-start justify-between gap-4 mb-6">
+  <header class="flex flex-wrap items-start justify-between gap-4 mb-6 bg-navy text-white rounded-2xl px-5 py-6">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">SME Loan Pre-Screener</h1>
-      <p class="text-sm text-slate-400 mt-1 max-w-xl">Explainable, fair pre-screening for South African SME working-capital applications. An AI co-pilot for credit officers — computed entirely in your browser.</p>
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">SME Loan Pre-Screener</h1>
+      <p class="text-sm text-[#51685c] mt-1 max-w-xl">Explainable, fair pre-screening for South African SME working-capital applications. An AI co-pilot for credit officers — computed entirely in your browser.</p>
     </div>
     <div class="flex gap-2">
-      <span class="text-[11px] font-bold tracking-widest text-cyan border border-cyan/30 rounded-full px-3 py-1.5">LOGISTIC MODEL · AUDITABLE</span>
-      <a href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank" class="text-[11px] font-bold tracking-widest border border-line rounded-full px-3 py-1.5 hover:border-cyan/50">GITHUB REPO</a>
+      <span class="text-[11px] font-bold tracking-widest text-[#7fe0a8] border border-[#7fe0a8]/40 rounded-full px-3 py-1.5">LOGISTIC MODEL · AUDITABLE</span>
+      <a href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank" class="text-[11px] font-bold tracking-widest text-white border border-white/40 rounded-full px-3 py-1.5 hover:border-white/80">GITHUB REPO</a>
     </div>
   </header>
 
-  <div class="disclaimer px-4 py-3 mb-6 text-sm text-amber-200/90">
-    <b class="text-amber-300">Indicative pre-screen only — human judgment is final.</b>
+  <div class="disclaimer px-4 py-3 mb-6 text-sm text-[#7a5200]">
+    <b class="text-[#8a5a00]">Indicative pre-screen only — human judgment is final.</b>
     This tool does not approve or decline loans; it helps a qualified credit officer decide faster.
     Production deployment would require compliance with the National Credit Act (NCA) and POPIA (out of scope for this prototype).
   </div>
@@ -70,7 +70,7 @@ tailwind.config = { theme: { extend: { colors: { navy:'#0a1628', panel:'#0f2038'
           <select id="history"><option value="1">Yes</option><option value="0">No</option></select>
         </div>
         <button id="run" class="btn btn-primary w-full mt-2">Run pre-screen</button>
-        <p class="text-[11px] text-slate-500 leading-4">Sector is recorded for auditing and fairness monitoring but is excluded from the model inputs — see the fairness note below.</p>
+        <p class="text-[11px] text-[#6b7f74] leading-4">Sector is recorded for auditing and fairness monitoring but is excluded from the model inputs — see the fairness note below.</p>
       </div>
     </section>
 
@@ -79,19 +79,19 @@ tailwind.config = { theme: { extend: { colors: { navy:'#0a1628', panel:'#0f2038'
       <div id="result" class="card p-6 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p class="text-xs font-bold tracking-[.2em] text-slate-400 mb-2">INDICATIVE ASSESSMENT</p>
+            <p class="text-xs font-bold tracking-[.2em] text-[#51685c] mb-2">INDICATIVE ASSESSMENT</p>
             <span id="band" class="band-pill"></span>
           </div>
           <div class="text-right">
-            <p class="text-xs font-bold tracking-[.2em] text-slate-400">CONFIDENCE</p>
+            <p class="text-xs font-bold tracking-[.2em] text-[#51685c]">CONFIDENCE</p>
             <p id="conf" class="text-3xl font-extrabold"></p>
-            <p id="prob" class="text-xs text-slate-500 mt-1"></p>
+            <p id="prob" class="text-xs text-[#6b7f74] mt-1"></p>
           </div>
         </div>
-        <div class="mt-4 h-3 rounded-full overflow-hidden" style="background:#0a1628; border:1px solid #1d3557">
+        <div class="mt-4 h-3 rounded-full overflow-hidden" style="background:#e6efe9; border:1px solid #d7e3da">
           <div id="probbar" class="h-full transition-all duration-500" style="width:0%"></div>
         </div>
-        <div class="flex justify-between text-[10px] text-slate-500 mt-1"><span>0%</span><span>35% — review band — 65%</span><span>100%</span></div>
+        <div class="flex justify-between text-[10px] text-[#6b7f74] mt-1"><span>0%</span><span>35% — review band — 65%</span><span>100%</span></div>
       </div>
 
       <div id="factors" class="card p-6 hidden">
@@ -101,16 +101,16 @@ tailwind.config = { theme: { extend: { colors: { navy:'#0a1628', panel:'#0f2038'
 
       <div class="card p-6">
         <h2 class="text-xs font-bold tracking-[.2em] text-cyan mb-3">MODEL TRANSPARENCY &amp; FAIRNESS</h2>
-        <ul class="text-[13px] text-slate-400 space-y-2 list-disc pl-5">
-          <li>Deployed model: <b class="text-slate-200">logistic regression</b> over four auditable ratios (instalment coverage, operating margin, debt burden, loan-to-revenue) plus trading years and prior history. Every factor maps 1:1 to a model input.</li>
-          <li>Held-out test (200 SMEs): <b class="text-slate-200">ROC-AUC 0.72</b>, precision 0.49, recall 0.64 — recall is weighted above precision so fundable SMEs are not wrongly discouraged (false negatives harm the applicant).</li>
+        <ul class="text-[13px] text-[#51685c] space-y-2 list-disc pl-5">
+          <li>Deployed model: <b class="text-[#123524]">logistic regression</b> over four auditable ratios (instalment coverage, operating margin, debt burden, loan-to-revenue) plus trading years and prior history. Every factor maps 1:1 to a model input.</li>
+          <li>Held-out test (200 SMEs): <b class="text-[#123524]">ROC-AUC 0.72</b>, precision 0.49, recall 0.64 — recall is weighted above precision so fundable SMEs are not wrongly discouraged (false negatives harm the applicant).</li>
           <li>Fairness audit (see repo): false-negative rates are monitored by sector and business size; business-size proxies (raw Rand amounts) are excluded from the model — only scale-free ratios are used.</li>
         </ul>
       </div>
     </section>
   </div>
 
-  <footer class="text-center text-xs text-slate-500 mt-10">
+  <footer class="text-center text-xs text-[#6b7f74] mt-10">
     Prototype by Freddy Thosago · synthetic data only, no real customers ·
     <a class="text-cyan hover:underline" href="https://github.com/tshepisofrominnostation/sme-loan-prescreener" target="_blank">full evaluation, fairness audit and executive write-up on GitHub</a>
   </footer>
@@ -183,9 +183,9 @@ function approvalProbability(a) {
 }
 
 function bandOf(p) {
-  if (p >= BANDS.high) return { key: "likely", label: "LIKELY TO QUALIFY", cls: "band-likely", dot: "#34d399" };
-  if (p >= BANDS.low)  return { key: "review", label: "NEEDS REVIEW",       cls: "band-review", dot: "#facc15" };
-  return { key: "unlikely", label: "UNLIKELY TO QUALIFY", cls: "band-unlikely", dot: "#f87171" };
+  if (p >= BANDS.high) return { key: "likely", label: "LIKELY TO QUALIFY", cls: "band-likely", dot: "#009639" };
+  if (p >= BANDS.low)  return { key: "review", label: "NEEDS REVIEW",       cls: "band-review", dot: "#e08a00" };
+  return { key: "unlikely", label: "UNLIKELY TO QUALIFY", cls: "band-unlikely", dot: "#c62828" };
 }
 
 function confidenceOf(p) {
@@ -278,7 +278,7 @@ document.getElementById("run").onclick = () => {
   const list = document.getElementById("factorList");
   list.innerHTML = factorsOf(app).map(([dir, text]) => {
     const icon = dir === "up" ? "▲" : dir === "down" ? "▼" : "•";
-    const color = dir === "up" ? "#34d399" : dir === "down" ? "#f87171" : "#94a3b8";
+    const color = dir === "up" ? "#009639" : dir === "down" ? "#c62828" : "#8aa095";
     return `<div class="factor f-${dir}"><span style="color:${color};font-weight:700">${icon}</span> ${text}</div>`;
   }).join("");
   document.getElementById("factors").classList.remove("hidden");
